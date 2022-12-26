@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Reflection;
 
+#nullable disable
+
 namespace DTNT
 {
     class Program
@@ -42,6 +44,22 @@ namespace DTNT
             {
                 Console.WriteLine($"False: {x + y}");
             }
+
+            Console.WriteLine($"Default value of int: {default(int)}");
+            Console.WriteLine($"Default value of string: {default(string)}");
+            Console.WriteLine($"Default value of bool: {default(bool)}");
+            Console.WriteLine($"Default value of DateTime: {default(DateTime)}");
+
+            string[] names = new string[4];
+            names[0] = "Alice";
+            names[1] = "Robert";
+            names[2] = "Chelsea";
+            names[3] = "Daniel";
+
+            for (int i = 0; i < names.Length; i++)
+            {
+                Console.WriteLine($"{names[i]}");
+            }
         }
         static void Numbers()
         {
@@ -74,11 +92,27 @@ namespace DTNT
             Console.WriteLine("env_path: {0}", env_path);
             Console.WriteLine("string_path: {0}", string_path);
         }
-        static void Main(string[] args)
+        static async System.Threading.Tasks.Task Go()
         {
-            System.Data.DataSet data_set;
-            System.Net.Http.HttpClient client;
+            System.Data.DataSet data_set = new System.Data.DataSet("asdf");
+            System.Net.Http.HttpClient client = new System.Net.Http.HttpClient();
 
+            try
+            {
+                System.Net.Http.HttpResponseMessage res = await client.GetAsync("http://microsoft.com/");
+                res.EnsureSuccessStatusCode();
+                string res_body = await res.Content.ReadAsStringAsync();
+                Console.WriteLine(res_body);
+            }
+            catch (System.Net.Http.HttpRequestException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            Console.WriteLine(data_set);
+        }
+        static async System.Threading.Tasks.Task Main(string[] args)
+        {
             Foo();
             Numbers();
             Paths();
@@ -99,6 +133,8 @@ namespace DTNT
                 }
                 Console.WriteLine("{0} methods", method_count);
             }
+
+            await Go();
         }
     }
 }
