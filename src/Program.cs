@@ -76,7 +76,8 @@ namespace DTNT
             WriteLine($"\n\ndecimal: {sizeof(decimal)}-byte"); // 16-byte, 64-bit
             WriteLine($"decimal range:\n{decimal.MinValue:N0}\nto\n{decimal.MaxValue:N0}");
         }
-        static void Bitwise() {
+        static void Bitwise()
+        {
             int a = 0b_0000_0110;
             int b = 0b_0000_1010;
             // Bitwise operations
@@ -123,8 +124,45 @@ namespace DTNT
 
             WriteLine(data_set);
         }
+        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
         static async System.Threading.Tasks.Task Main(string[] args)
         {
+            if (args.Length == 0)
+            {
+                ConsoleKeyInfo key = ReadKey();
+                WriteLine($"{key.Key}, {key.KeyChar}, {key.Modifiers}");
+
+                object read = System.Console.ReadLine();
+            }
+            else
+            {
+                foreach (string arg in args)
+                {
+                    WriteLine(arg);
+                }
+                if (args.Length == 4)
+                {
+                    ForegroundColor = (ConsoleColor)Enum.Parse(
+                        enumType: typeof(ConsoleColor),
+                        value: args[0], ignoreCase: true
+                        );
+                    BackgroundColor = (ConsoleColor)Enum.Parse(
+                        enumType: typeof(ConsoleColor),
+                        value: args[1], ignoreCase: true
+                        );
+                    try
+                    {
+                        WindowWidth = int.Parse(args[2]);
+                        WindowHeight = int.Parse(args[3]);
+                    }
+                    catch (PlatformNotSupportedException)
+                    {
+                        var OS = System.Runtime.InteropServices.RuntimeInformation.OSDescription;
+                        WriteLine($"Terminal resizing is not supported on {OS}");
+                    }
+                }
+            }
+
             Foo();
             Numbers();
             Bitwise();
