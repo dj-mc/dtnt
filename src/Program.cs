@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+
 using static System.Console;
 
 #nullable disable
@@ -90,6 +92,7 @@ namespace DTNT
         }
         static void Paths()
         {
+            // The many ways to retrieve a path
             var app_path = System.AppContext.BaseDirectory;
             var domain_path = System.AppDomain.CurrentDomain.BaseDirectory;
             var io_path = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -104,6 +107,39 @@ namespace DTNT
             WriteLine("io_dir_path: {0}", io_dir_path);
             WriteLine("env_path: {0}", env_path);
             WriteLine("string_path: {0}", string_path);
+        }
+        static void MatchPattern()
+        {
+            // /home/dan/d/dtnt
+            string current_directory = Directory.GetCurrentDirectory();
+            Stream open_file_stream = File.Open(
+                Path.Combine(current_directory, "data.txt"),
+                FileMode.OpenOrCreate
+                );
+
+            string switch_message = string.Empty;
+
+            switch (open_file_stream)
+            {
+                case null:
+                    switch_message = "Stream is null";
+                    break;
+                case MemoryStream memory_address:
+                    switch_message = "Stream is a memory address";
+                    break;
+                case FileStream writeable_file when open_file_stream.CanWrite:
+                    switch_message = "Stream is a writeable file";
+                    break;
+                case FileStream read_only_file:
+                    switch_message = "Stream is a read-only file";
+                    break;
+                default:
+                    switch_message = "Stream is an unknown type";
+                    break;
+            }
+
+            WriteLine(switch_message);
+
         }
         static async System.Threading.Tasks.Task Go()
         {
@@ -167,6 +203,7 @@ namespace DTNT
             Numbers();
             Bitwise();
             Paths();
+            MatchPattern();
 
             // Get array of referenced assembly names
             foreach (var referenced in Assembly.GetEntryAssembly().GetReferencedAssemblies())
