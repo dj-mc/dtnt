@@ -108,7 +108,16 @@ namespace DTNT
             WriteLine("env_path: {0}", env_path);
             WriteLine("string_path: {0}", string_path);
         }
-        static void MatchPattern()
+        static async System.Threading.Tasks.Task AsyncReadStream(Stream open_file_stream)
+        {
+            byte[] result; // Read the file
+            result = new byte[open_file_stream.Length];
+            await open_file_stream.ReadAsync(result, 0, (int)open_file_stream.Length);
+            // Decode bytes as ASCII text
+            string result_text = System.Text.Encoding.ASCII.GetString(result);
+            WriteLine(result_text);
+        }
+        static async System.Threading.Tasks.Task MatchPattern()
         {
             // /home/dan/d/dtnt
             string current_directory = Directory.GetCurrentDirectory();
@@ -129,9 +138,11 @@ namespace DTNT
                     break;
                 case FileStream writeable_file when open_file_stream.CanWrite:
                     switch_message = "Stream is a writeable file";
+                    await AsyncReadStream(open_file_stream);
                     break;
                 case FileStream read_only_file:
                     switch_message = "Stream is a read-only file";
+                    await AsyncReadStream(open_file_stream);
                     break;
                 default:
                     switch_message = "Stream is an unknown type";
@@ -139,7 +150,6 @@ namespace DTNT
             }
 
             WriteLine(switch_message);
-
         }
         static async System.Threading.Tasks.Task Go()
         {
@@ -203,7 +213,7 @@ namespace DTNT
             Numbers();
             Bitwise();
             Paths();
-            MatchPattern();
+            await MatchPattern();
 
             // Get array of referenced assembly names
             foreach (var referenced in Assembly.GetEntryAssembly().GetReferencedAssemblies())
